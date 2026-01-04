@@ -1,0 +1,13 @@
+start_time = 10:00
+now_time = 11:00
+=> time = start_time - now_time
+
+how to do pause???
+
+pause_time = 0
+start_time = 10:00
+pause_start_time = 10:30
+pause_stop_time = 10:40
+pause_time += pause_stop_time - pause_start_time
+now_time = 11:00
+=> time = now_time - start_time - pause_time = 11:00 - 10:00 - 00:10 = 00:50
