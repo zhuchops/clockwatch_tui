@@ -42,6 +42,7 @@ impl App {
     }
 
     pub fn draw(&self, frame: &mut Frame) {
+        frame.render_widget(self, frame.area());
         frame.render_widget(&self.clock, frame.area());
     }
 
@@ -73,7 +74,24 @@ impl App {
 
 impl Widget for &App {
     fn render(self, area: ratatui::prelude::Rect, buf: &mut ratatui::prelude::Buffer) {
-        todo!()
+
+        let title = Line::from(" Clockwatch rust app ".bold()).centered();
+        
+        let instructions = Line::from(vec![
+            " Pause/Start ".into(),
+            "<Space>".blue().bold(),
+            " Exit ".into(),
+            "<q>".blue().bold(),
+        ]).centered();
+
+        let block = Block::default()
+            .borders(Borders::ALL)
+            .title(title)
+            .title_bottom(instructions);
+        
+        Paragraph::default()
+            .block(block)
+            .render(area, buf);
     }
 }
 
@@ -108,30 +126,11 @@ impl Widget for &Clockwatch {
         let secs: u128 = all_millis / 1000 % 60;
         let millis: u128 = all_millis % 1000;
 
-        let clock_text = Text::from(vec![Line::from(vec![
-            hours.to_string().into(),
-            ":".into(),
-            minutes.to_string().into(),
-            ":".into(),
-            secs.to_string().into(),
-            ":".into(),
-            millis.to_string().into(),
-        ])]);
+        let clock_text = Text::from(vec![Line::from(format!(
+            "{:02}:{:02}:{:02}:{:03}",
+            hours, minutes, secs, millis
+        ))]);
 
-        let title = Line::from(" Clockwatch rust app ".bold()).centered();
-        
-        let instructions = Line::from(vec![
-            " Pause/Start ".into(),
-            "<Space>".blue().bold(),
-            " Exit ".into(),
-            "<q>".blue().bold(),
-        ]).centered();
-
-        let block = Block::default()
-            .borders(Borders::ALL)
-            .title(title)
-            .title_bottom(instructions);
-        
         let layout = Layout::default()
             .direction(Direction::Vertical)
             .constraints([
@@ -139,10 +138,6 @@ impl Widget for &Clockwatch {
                 Constraint::Min(1),
                 Constraint::Percentage(50),
             ]).split(area);
-
-        Paragraph::default()
-            .block(block)
-            .render(area, buf);
 
         Paragraph::new(clock_text)
             .centered()
